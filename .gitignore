@@ -1,0 +1,4 @@
+.vscode/
+creds.json
+.DS_Store
+.clasprc.json
