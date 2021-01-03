@@ -29,7 +29,7 @@ for (let i = 0; i < bC.length; i++) {
             'blockNumber': bC[i][0],
             'startTime': bC[i][1],
             'endTime': bC[i][2],
-            'date': bC[i][3],
+            'dt': bC[i][3],
         })
 }
 
@@ -37,10 +37,10 @@ var eventArr = eventConfig.map(x => x.event);
 
 // Populates scheduling spreadsheet with names and emails
 
-function populateSchedule() {
+function schedule() {
     //read into object lists
 
-    let maxColLetter = letter => {return String.fromCharCode(`${letter}`.charCodeAt(0) + blockConfig.length - 1);}
+    let maxColLetter = (letter) => {return String.fromCharCode(`${letter}`.charCodeAt(0) + blockConfig.length - 1);}
 
     let studentData = responses.getRange(`B2:C${MAX_STUDENTS + 1}`).getValues();
     let eventData = responses.getRange(`D2:${maxColLetter('D')}${MAX_STUDENTS + 1}`).getValues(); 
@@ -86,15 +86,37 @@ function populateSchedule() {
 
     eventScheduleRange.setValues(eventScheduleValues);
 
+    //send emails based on time trigger
+
     return 1;
 }
 
-function sendTimedMail(time, addresses, subject, message) {
+const parseTime = (blockNum) => {
+    let obj = blockConfig.filter(x => x.blockNumber == blockNum)[0];
+
+    //Logger.log(obj);
+
+    let dat1 = obj.startTime, dat2 = obj.dt;
+
+    //Logger.log(`${dat2.getFullYear()}, ${dat2.getMonth()}, ${dat2.getDay()}`);
+
+    //Logger.log(dat1.getHours() + '\n' + dat2.getFullYear());
     
+    return new Date(dat2.getFullYear(), dat2.getMonth(), dat2.getDate(), dat1.getHours(), dat1.getMinutes(), dat1.getSeconds(), 0);
+};
+
+const sendMail = (addresses, subject, message) => {
+    MailApp.sendEmail(addresses, subject, message);
+};
+
+function test() {
+    /* let dateObj = new Date(2021, 0, 2, 19, 44, 0, 0);
+    Logger.log(dateObj.toDateString());
+    ScriptApp.newTrigger('Logger.log("Test")').timeBased().at(dateObj).create(); */
+    //for (let i = 0; i < ScriptApp.getProjectTriggers().length; i++) {ScriptApp.deleteTrigger(ScriptApp.getProjectTriggers()[i]);}
+
+    //Logger.log(parseTime(1));
+    //Logger.log(blockConfig[0]);
     
-    MailApp.sendMail({
-        to: addresses,
-        subject: subject,
-        body: message
-    })
+    Logger.log(parseTime(1).toString());
 }
