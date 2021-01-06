@@ -19,8 +19,6 @@ Here are your tests:
 ${eventUrls}
 Good luck,
 The Captains`;
-
-
 };
 
 //-------------------GLOBAL SETUP-------------------------------------------------
@@ -36,7 +34,7 @@ var storage = SpreadsheetApp.openByUrl(SS_URL).getSheets()[3];
 //reading in config
 const MAX_STUDENTS = config.getRange('B2').getValue();
 var eC = config.getRange('A7:C30').getValues();
-var bC = config.getRange('E7:H17').getValues();
+var bC = config.getRange('E7:F17').getValues();
 
 var eventConfig = [], blockConfig = [];
 
@@ -57,9 +55,7 @@ for (let i = 0; i < bC.length; i++) {
     if (bC[i][0] != '')
         blockConfig.push({
             'blockNumber': bC[i][0],
-            'startTime': bC[i][1],
-            'endTime': bC[i][2],
-            'dt': bC[i][3],
+            'datetime': bC[i][1],
         })
 }
 
@@ -146,10 +142,10 @@ function schedule() {
 
 //global variables
 var eventStorageRange = storage.getRange(`A2:E${eventConfig.length + 1}`);
-var blockStorageRange = storage.getRange(`G2:I${blockConfig.length + 1}`);
+var blockStorageRange = storage.getRange(`G2:H${blockConfig.length + 1}`);
 var eventStorageValues = eventStorageRange.getValues();
 var blockStorageValues = blockStorageRange.getValues();
-var stackRange = storage.getRange(`K2:${blockConfig.length + 1}`);
+var stackRange = storage.getRange(`J2:J${blockConfig.length + 1}`);
 var stackValues = stackRange.getValues();
 
 /**
@@ -171,17 +167,19 @@ function sendScheduledEmails() {
 
     for (let i = 0; i < blockStorageValues.length; i++) {
         blockStorageValues[i][0] = Number(blockConfig[i].blockNumber);
-        blockStorageValues[i][1] = blockConfig[i].startTime;
-        blockStorageValues[i][2] = blockConfig[i].dt;
+        blockStorageValues[i][1] = blockConfig[i].datetime;
     }
     blockStorageRange.setValues(blockStorageValues);
 
     for (let i = 0; i < blockConfig.length; i++) {
         stackValues[i][0] = blockConfig[i].blockNumber;
-        ScriptApp.newTrigger('sendEmail').timeBased().
-          at(parseTime(blockConfig[i].startTime, blockConfig[i].dt)).create();
+        //set trigger for each block
+        ScriptApp.newTrigger(`send${blockConfig[i].blockNumber}`).timeBased().
+          at(parseTime(blockStorageValues[i][1])).create();
+        //parseTime(blockStorageValues[i][1]);
     }
     stackRange.setValues(stackValues);
+    
 }
 
 /**
@@ -218,15 +216,78 @@ function sendEmail() {
             let subject = `Block ${stackValues[i][0]} Test-Offs` + (stackValues[i][0] == blockConfig.length ? ' (Flex)' : '');
             let body = msg(urlString);
 
-            if (!to.match(/(\s*)|(,*)/) || to != '')
-              Logger.log(`${to}\n${subject}\n${body}`);
-            GmailApp.sendEmail(to, subject, body);
+            //Logger.log(to);
 
-            //stackValues[i][0] = 'COMPLETE';
+            if (to) {
+                GmailApp.sendEmail(to, subject, body);
+                Logger.log(`${to}\n${subject}\n${body}`);
+            }
+
+            stackValues[i][0] = 'COMPLETE';
+            //only run for one block;
+            break;
         }
     }
     stackRange.setValues(stackValues);
 }
+
+/**
+ * Standalone function to send email VERSION 2
+ * @function sendEmail2
+ */
+function sendEmail2(blockNum) { 
+    let currBlockEvents = [];
+    
+    for (let j = 0; j < eventStorageValues.length; j++) {
+      if (eventStorageValues[j][1] == blockNum)
+        currBlockEvents.push(eventStorageValues[j]);
+      else if (blockNum == blockConfig.length && eventStorageValues[j][4] != '')
+        currBlockEvents.push(eventStorageValues[j]);
+    }
+    
+    //Logger.log(currBlockEvents);
+    
+    let urlNames = [], addresses = [];
+    for (let j = 0; j < currBlockEvents.length; j++) {
+      urlNames.push({'name': currBlockEvents[j][0], 'url': currBlockEvents[j][2]});
+      addresses.push(currBlockEvents[j][blockNum == blockConfig.length ? 4 : 3]);
+    }
+    let urlString = '';
+    urlNames.forEach(x => {urlString += `${x.name}: ${x.url}\n`;});
+    
+    let to = addresses.filter(x => x != '').join();
+    let subject = `Block ${blockNum} Test-Offs` + (blockNum == blockConfig.length ? ' (Flex)' : '');
+    let body = msg(urlString);
+    
+    //Logger.log(to);
+    
+    if (to) {
+      GmailApp.sendEmail(to, subject, body);
+      Logger.log(`${to}\n${subject}\n${body}`);
+    }
+    
+    if (stackValues[blockNum - 1][0])
+        stackValues[blockNum - 1][0] = 'COMPLETE';
+    
+    stackRange.setValues(stackValues);
+}
+
+//set of anonymous functions for up to 15 time blocks, improves reliability vs. reading from sheet
+const send1 = () => {sendEmail2(1)};
+const send2 = () => {sendEmail2(2)};
+const send3 = () => {sendEmail2(3)};
+const send4 = () => {sendEmail2(4)};
+const send5 = () => {sendEmail2(5)};
+const send6 = () => {sendEmail2(6)};
+const send7 = () => {sendEmail2(7)};
+const send8 = () => {sendEmail2(8)};
+const send9 = () => {sendEmail2(9)};
+const send10 = () => {sendEmail2(10)};
+const send11 = () => {sendEmail2(11)};
+const send12 = () => {sendEmail2(12)};
+const send13 = () => {sendEmail2(13)};
+const send14 = () => {sendEmail2(14)};
+const send15 = () => {sendEmail2(15)};
 
 //utility function, do not modify or use
 const deleteTriggers = () => {
@@ -265,7 +326,8 @@ function removeDuplicateResponses(studentData) {
  * @param {string} date the date
  * @returns a Date object for this info
  */
-const parseTime = (time, date) => {
-    let dat1 = new Date(time), dat2 = new Date(date);
-    return new Date(dat2.getFullYear(), dat2.getMonth(), dat2.getDate(), dat1.getHours(), dat1.getMinutes(), dat1.getSeconds(), 0);
+const parseTime = (datetime) => {
+    let dat = new Date(datetime);
+    Logger.log(dat);
+    return dat;
 };
