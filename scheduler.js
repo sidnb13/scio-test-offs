@@ -1,20 +1,21 @@
 /**
 * test-off-scheduler
-* By Sidharth Baskaran (LASA 2022), last edit on Jan 3 2021
-* Goal: to automate the Science Olympiad test-off process at my high school
-* Nothing in this file should have to be changed except for the email body below (if needed)
+* By Sidharth Baskaran (LASA 2022), last edit on 3/1/21
+* Goal: to automate the Science Olympiad test-off process
+* Nothing in this file should have to be changed except for the email body below (if needed) and the spreadsheet link
 * Only work with the config of the spreadsheet and run the "schedule" function when ready
 */
 
-//NOTE: any changes will ruin indentation of the message here
+//NOTE: any changes will change indentation of the message here
 const msg = (eventUrls) => {
     return `Hi all,
     
-Before you start, make sure to review the test-off expectations (link.com). 
-You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues.
-Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit, we will be able to see the timestamps.
+Before you start, make sure to review the test-off expectations from before. 
+You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues. Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit; we will be able to see the timestamps.
 
-Here are your tests:
+When finished, submit to this form: google.com
+
+Here are your tests (only click on the one you were assigned for this block):
 
 ${eventUrls}
 Good luck,
@@ -23,7 +24,7 @@ The Captains`;
 
 //-------------------GLOBAL SETUP-------------------------------------------------
 
-const SS_URL = 'https://docs.google.com/spreadsheets/d/1DGQLqfB9BD5VlRVpqAN6XMauoq0mu94S1DKHqez3uXU/edit#gid=1951640728';
+const SS_URL = 'https://docs.google.com/spreadsheets/d/1wG_vInafAUZMU6tLLPkyjCXiUgkOWhDFU0Vd3NOchww/edit?usp=sharing';
 
 //access to each sheet
 var config = SpreadsheetApp.openByUrl(SS_URL).getSheets()[0];
@@ -68,7 +69,6 @@ var eventArr = eventConfig.map(x => x.event);
  * @function schedule
  */
 function schedule() {
-
     //read into object lists
 
     let maxColLetter = (letter) => {return String.fromCharCode(`${letter}`.charCodeAt(0) + blockConfig.length - 1);}
@@ -89,6 +89,7 @@ function schedule() {
                 let nm = `${studentData[i][0]}`;
 
                 if (j == eventData[0].length - 1) { //case for flex block
+                    //Logger.log(eventData[i][j]);
                     eventConfig[idx].flexAddresses += `${tkn},`;
                     eventConfig[idx].flexNames += `${nm},`;
                 } else {
