@@ -1,6 +1,6 @@
 /**
-* test-off-scheduler
-* By Sidharth Baskaran (LASA 2022), last edit on 3/1/21
+* Scheduler.gs
+* By Sidharth Baskaran (LASA '22), last edit on 3/3/21
 * Goal: to automate the Science Olympiad test-off process
 * Nothing in this file should have to be changed except for the email body below (if needed) and the spreadsheet link
 * Only work with the config of the spreadsheet and run the "schedule" function when ready
@@ -10,12 +10,12 @@
 const msg = (eventUrls) => {
     return `Hi all,
     
-Before you start, make sure to review the test-off expectations from before. 
-You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues. Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit; we will be able to see the timestamps.
+Before you start, make sure to review the test-off expectations from before (https://docs.google.com/document/d/15A4IijPQvPEh-zwHRowtq_b7tTyuulDdmhX6e8-ql-8/edit?usp=sharing). 
+You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues. Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit as we will be able to see the timestamps. We recommend having a system to quickly submit your work (e.g. phone scanner app) nearby.
 
-When finished, submit to this form: google.com
+When finished, submit a PDF of your test to this Google form: INSERT THE LINK HERE
 
-Here are your tests (only click on the one you were assigned for this block):
+Access the test you were assigned for this block from the list below:
 
 ${eventUrls}
 Good luck,
