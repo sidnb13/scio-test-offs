@@ -132,8 +132,9 @@ function schedule() {
     nameRange.setValues(nameValues);
 
     //send emails based on time trigger
-    managePermissions(1, false);
-    //sendScheduledEmails();
+    // for (let i = 1; i <= 6; ++i)
+    //     managePermissions(i, false);
+    sendScheduledEmails();
 
 }
 

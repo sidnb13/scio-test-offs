@@ -52,8 +52,21 @@ function sendScheduledEmails() {
  */
 function sendEmail(blockNum) {
 
+    //populate another eventConfig object for use in the permission method from the storage "database"
+    var dbEventConfig = []
+
+    for (let arr of eventStorageValues) {
+      dbEventConfig.push({
+            'event': arr[0],
+            'blockNumber': arr[1],
+            'url': arr[2],
+            'blockAddresses': arr[3],
+            'flexAddresses': arr[4]
+        });
+    }
+
     //manage test document permissions for this block at time of trigger
-    managePermissions(blockNum, false);
+    managePermissions(blockNum, dbEventConfig, false);
 
     let currBlockEvents = [];
     
