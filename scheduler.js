@@ -13,7 +13,7 @@ const msg = (eventUrls) => {
 Before you start, make sure to review the test-off expectations from before (https://docs.google.com/document/d/15A4IijPQvPEh-zwHRowtq_b7tTyuulDdmhX6e8-ql-8/edit?usp=sharing). 
 You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues. Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit as we will be able to see the timestamps. We recommend having a system to quickly submit your work (e.g. phone scanner app) nearby.
 
-When finished, submit a PDF of your test to this Google form: INSERT THE LINK HERE
+When finished, submit a PDF of your test to this Google form after reading the submission instructions carefully: https://forms.gle/kEVYSSpRuqAVHgBq9
 
 Access the test you were assigned for this block from the list below:
 
@@ -141,20 +141,39 @@ function schedule() {
 //-------------------AUX FUNCTIONS-------------------------------------------------
 
 /**
- * Reset permissions, not to be used during test-offs window
- * Takes a long time to execute
+ * Get links for all files in a folder (alphabetical order)
  */
-const resetPermissions = () => {
-  for (let i = 0; i < bC.length; ++i)
-      managePermissions(i, true);
-}
+function getTestUrls() {
+  let folderId = '1yQSsG0dI_X6Iwu9trXxOcmkrVcVY8b9s';
+  let folder = DriveApp.getFolderById(folderId)
+  let files = folder.getFilesByType(MimeType.PDF);
+  let hashMap = [];
 
+  while (files.hasNext()) {
+    let file = files.next();
+    file.setName(file.getName().replace("Copy of",""));
+    hashMap.push({
+      'name': file.getName(),
+      'url' : file.getUrl()
+    })
+  } 
+
+  hashMap = hashMap.sort(function (a, b) {
+    return a.name.localeCompare( b.name );
+  });
+
+  for (let f of hashMap)
+    Logger.log(`${f.name.replace('.pdf','')},${f.url}`);
+}
 
 /**
  * remove duplicate rows from responses spreadsheet
  * @param {sheet} studentData the response array of names + emails
  */
 function removeDuplicateResponses(studentData) {
+    if (studentData == null)
+      studentData = studentData = responses.getRange(`B2:C${MAX_STUDENTS + 1}`).getValues();
+
     let rowsToDel = [];
 
     //Logger.log(studentData);

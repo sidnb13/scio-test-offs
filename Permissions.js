@@ -7,7 +7,7 @@
 /**
  * Uses DriveApp to manage permissions of files in block-specific manner
  */
-function managePermissions(blockNum, eventData, revoke) {
+ function managePermissions(blockNum, eventData, revoke) {
   //Loop through event data structure with specified block and manage permissions
   for (let event of eventData) {
     var testDocument = DriveApp.getFileById(extractId(event.url));
@@ -40,9 +40,8 @@ function managePermissions(blockNum, eventData, revoke) {
         users = testDocument.getViewers();
         for (i in users) {
           email = users[i].getEmail();
-          if (email != "") {
+          if (email != "")
             testDocument.removeViewer(email);
-          }
         }
     }
   }
@@ -73,3 +72,14 @@ fileId,
 * extract id from url
 */
 const extractId = (url) => {return url.split(/\/+/)[4];};
+
+/**
+* Reset permissions, not to be used during test-offs window
+* Takes a long time to execute
+*/
+const resetPermissions = (config) => {
+if (config == null)
+  config = eventConfig;
+for (let i = 0; i < bC.length; ++i)
+    managePermissions(i,config,true);
+}
