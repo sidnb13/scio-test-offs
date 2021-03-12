@@ -10,10 +10,10 @@
 const msg = (eventUrls) => {
     return `Hi all,
     
-Before you start, make sure to review the test-off expectations from before (https://docs.google.com/document/d/15A4IijPQvPEh-zwHRowtq_b7tTyuulDdmhX6e8-ql-8/edit?usp=sharing). 
+Before you start, make sure to review the test-off expectations from before (https://docs.google.com/document/d/1mYsnflsSaMV6FyXaZ8dRRv8iozBNwd2E1oqS1ebnjnk/edit?usp=sharing). 
 You will have 50 minutes to take your test, with 10 additional minutes to make up for any submission issues. Don\'t count on this extra time to finish up since if you go beyond the 1 hour limit as we will be able to see the timestamps. We recommend having a system to quickly submit your work (e.g. phone scanner app) nearby.
 
-When finished, submit a PDF of your test to this Google form after reading the submission instructions carefully: https://forms.gle/kEVYSSpRuqAVHgBq9
+When finished, submit a PDF of your test to this Google form after reading the submission instructions carefully: https://forms.gle/gpCMjiP425NxFsGv9
 
 Access the test you were assigned for this block from the list below:
 
@@ -68,6 +68,9 @@ var eventArr = eventConfig.map(x => x.event);
  * @function schedule
  */
 function schedule() {
+    //populate links
+    getTestUrls();
+    
     //read into object lists
 
     let maxColLetter = (letter) => {return String.fromCharCode(`${letter}`.charCodeAt(0) + blockConfig.length - 1);}
@@ -107,7 +110,7 @@ function schedule() {
         eventConfig[i].flexNames = eventConfig[i].flexNames.replace(/,$/,'');
     }
 
-    //populate the scheduler sheet
+    //populate the database sheet
 
     let eventScheduleRange = scheduler.getRange(`D3:${maxColLetter('D')}${3 + eventArr.length - 1}`);
     let eventScheduleValues = eventScheduleRange.getValues();
@@ -158,12 +161,24 @@ function getTestUrls() {
     })
   } 
 
-  hashMap = hashMap.sort(function (a, b) {
-    return a.name.localeCompare( b.name );
-  });
+  function compare(a ,b) {
+    return a.name.replace(' ','').localeCompare(b.name.replace(' ',''));
+  }
 
-  for (let f of hashMap)
-    Logger.log(`${f.name.replace('.pdf','')},${f.url}`);
+  hashMap.sort(compare);
+
+  //Logger.log(hashMap)
+
+  for (let i = 0; i < eC.length; ++i) {
+    if (i < hashMap.length) {
+      //let name = hashMap[i].name.replace('.pdf','');
+      let url = hashMap[i].url;
+      eC[i][2] = url;
+    }
+  }
+
+  config.getRange('A7:C30').setValues(eC);
+
 }
 
 /**
