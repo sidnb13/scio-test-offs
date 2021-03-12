@@ -6,7 +6,7 @@
 
 //global variables
 var eventStorageRange = storage.getRange(`A2:E${eventConfig.length + 1}`);
-var blockStorageRange = storage.getRange(`G2:H${blockConfig.length + 1}`);
+var blockStorageRange = storage.getRange(`G2:I${blockConfig.length + 1}`);
 var eventStorageValues = eventStorageRange.getValues();
 var blockStorageValues = blockStorageRange.getValues();
 var stackRange = storage.getRange(`J2:J${blockConfig.length + 1}`);
@@ -32,15 +32,20 @@ function sendScheduledEmails() {
     for (let i = 0; i < blockStorageValues.length; i++) {
         blockStorageValues[i][0] = Number(blockConfig[i].blockNumber);
         blockStorageValues[i][1] = blockConfig[i].datetime;
+        blockStorageValues[i][2] = blockConfig[i].toSend;
     }
     blockStorageRange.setValues(blockStorageValues);
 
     for (let i = 0; i < blockConfig.length; i++) {
         stackValues[i][0] = blockConfig[i].blockNumber;
+        let eventTime = parseTime(blockStorageValues[i][1]);
         //set trigger for each block
-        ScriptApp.newTrigger(`send${blockConfig[i].blockNumber}`).timeBased().
-          at(parseTime(blockStorageValues[i][1])).create();
-        //parseTime(blockStorageValues[i][1]);
+        if (blockConfig[i].toSend == 1 && eventTime > Date.now()) {
+          ScriptApp.newTrigger(`send${blockConfig[i].blockNumber}`).timeBased().
+            at(eventTime).create();
+        } else {
+          stackValues[i][0] = 'DEPRECATED';
+        }
     }
     stackRange.setValues(stackValues);
     
@@ -65,7 +70,7 @@ function sendEmail(blockNum) {
         });
     }
 
-    //manage test document permissions for this block at time of trigger
+    //manage test document permissions for blocks 1->(n-1)
     managePermissions(blockNum, dbEventConfig, false);
 
     let currBlockEvents = [];
@@ -91,10 +96,8 @@ function sendEmail(blockNum) {
     let subject = `Block ${blockNum} Test-Offs` + (blockNum == blockConfig.length ? ' (Flex)' : '');
     let body = msg(urlString);
     
-    //Logger.log(to);
-    
     if (to) {
-      GmailApp.sendEmail(to, subject, body);
+      GmailApp.sendEmail(to, subject, body); //uncomment to send emails WARNING CONSEQUENTIAL
       Logger.log(`${to}\n${subject}\n${body}`);
     }
     
@@ -120,9 +123,3 @@ const send12 = () => {sendEmail(12)};
 const send13 = () => {sendEmail(13)};
 const send14 = () => {sendEmail(14)};
 const send15 = () => {sendEmail(15)};
-
-//utility function, do not modify or use
-const deleteTriggers = () => {
-  for (let i = 0; i < ScriptApp.getProjectTriggers().length; i++)
-      ScriptApp.deleteTrigger(ScriptApp.getProjectTriggers()[i]);
-};

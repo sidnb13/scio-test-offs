@@ -34,7 +34,7 @@ var storage = SpreadsheetApp.openByUrl(SS_URL).getSheets()[3];
 //reading in config
 const MAX_STUDENTS = config.getRange('B2').getValue();
 var eC = config.getRange('A7:C30').getValues();
-var bC = config.getRange('E7:F17').getValues();
+var bC = config.getRange('E7:G17').getValues();
 
 var eventConfig = [], blockConfig = [];
 
@@ -56,6 +56,7 @@ for (let i = 0; i < bC.length; i++) {
         blockConfig.push({
             'blockNumber': bC[i][0],
             'datetime': bC[i][1],
+            'toSend': bC[i][2]
         })
 }
 
@@ -90,13 +91,15 @@ function schedule() {
                 let tkn = `${studentData[i][1]}`;
                 let nm = `${studentData[i][0]}`;
 
+                //REGEX CHECKS -- WHITESPACE BREAK THE CODE
+
                 if (j == eventData[0].length - 1) { //case for flex block
                     //Logger.log(eventData[i][j]);
-                    eventConfig[idx].flexAddresses += `${tkn},`;
-                    eventConfig[idx].flexNames += `${nm},`;
+                    eventConfig[idx].flexAddresses += `${tkn.replace(/\s/,'')},`;
+                    eventConfig[idx].flexNames += `${nm.replace(/\s/,'')},`;
                 } else {
-                    eventConfig[idx].blockAddresses += `${tkn},`;
-                    eventConfig[idx].blockNames += `${nm},`;
+                    eventConfig[idx].blockAddresses += `${tkn.replace(/\\s/,'')},`;
+                    eventConfig[idx].blockNames += `${nm.replace(/\\s/,'')},`;
                 }
                 //Logger.log(`${eventData[i][j]} ${eventArr.indexOf(eventData[i][j])}`);
             }
@@ -134,10 +137,12 @@ function schedule() {
     eventScheduleRange.setValues(eventScheduleValues);
     nameRange.setValues(nameValues);
 
-    //send emails based on time trigger
-    // for (let i = 1; i <= 6; ++i)
-    //     managePermissions(i, false);
-    sendScheduledEmails();
+    //Crucial method calls      
+
+    // for (let i = 1; i < blockConfig.length; i++)
+    //   managePermissions(i, eventConfig, false);
+
+    sendScheduledEmails(); //uncomment to send emails
 
 }
 
@@ -206,6 +211,12 @@ function removeDuplicateResponses(studentData) {
     for (let i = rowsToDel.length - 1; i >= 0; i--)
         responses.deleteRow(rowsToDel[i]);
 }
+
+//utility function, do not modify or use
+const deleteTriggers = () => {
+  for (let i = ScriptApp.getProjectTriggers().length - 1; i >= 0; i--)
+      ScriptApp.deleteTrigger(ScriptApp.getProjectTriggers()[i]);
+};
 
 /**
  * @const parseTime

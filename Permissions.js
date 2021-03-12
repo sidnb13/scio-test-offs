@@ -21,17 +21,27 @@
           //Logger.log(eventAddresses);
 
           if (blockNum != bC.length - 1) {
-              for (let add of eventAddresses) {
+              for (let riskyAddress of eventAddresses) {
+                  add = riskyAddress.trim();
                   if (add != '') {
                     //Logger.log(add);
-                    insertSilentPermission(extractId(event.url),add,'user','reader');
+                    try {
+                      insertSilentPermission(extractId(event.url),add,'user','reader');
+                    } catch (e) {
+                      Logger.log(`Failed to share the ${event.name} test with "${add}"\nWill skip this address and continue execution`)
+                    }
                   }
               }
           } else if (blockNum == bC.length - 1) {
-              for (let add of flexAddresses) {
+              for (let riskyAddress of flexAddresses) {
+                  add = riskyAddress.trim();
                   if (add != '') {
                     //Logger.log(add);
-                    insertSilentPermission(extractId(event.url),add,'user','reader');
+                    try {
+                      insertSilentPermission(extractId(event.url),add,'user','reader');
+                    } catch (e) {
+                      Logger.log(`Failed to share the ${event.name} test with "${add}"\nWill skip this address and continue execution`)
+                    }
                   }
               }
           }
