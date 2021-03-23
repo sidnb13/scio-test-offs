@@ -33,6 +33,8 @@ var storage = SpreadsheetApp.openByUrl(SS_URL).getSheets()[3];
 
 //reading in config
 const MAX_STUDENTS = config.getRange('B2').getValue();
+const USE_EXCEPTIONS = config.getRange('B3').getValue();
+
 var eC = config.getRange('A7:C30').getValues();
 var bC = config.getRange('E7:G17').getValues();
 
