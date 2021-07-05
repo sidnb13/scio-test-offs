@@ -1,0 +1,19 @@
+{
+  "name": "test-off-scheduler",
+  "version": "1.0.0",
+  "description": "A Google Apps Script project to efficiently manage the distribution of test materials during team tryouts each season. This was done to curb the tedious process of sending out emails for each and every event and eliminate possibility of errors.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sidnb13/scio-test-offs.git"
+  },
+  "author": "Sidharth Baskaran",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sidnb13/scio-test-offs/issues"
+  },
+  "homepage": "https://github.com/sidnb13/scio-test-offs#readme"
+}

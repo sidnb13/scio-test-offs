@@ -1,14 +1,16 @@
 /**
  * EmailManagement.gs
- * By Sidharth Baskaran (LASA '22), last edit on 3/3/21
+ * By Sidharth Baskaran, last edit on 3/3/21
  * Goal: to send emails with time-based trigger 
  */
 
 //global variables
 var eventStorageRange = storage.getRange(`A2:E${eventConfig.length + 1}`);
 var blockStorageRange = storage.getRange(`G2:I${blockConfig.length + 1}`);
+
 var eventStorageValues = eventStorageRange.getValues();
 var blockStorageValues = blockStorageRange.getValues();
+
 var stackRange = storage.getRange(`J2:J${blockConfig.length + 1}`);
 var stackValues = stackRange.getValues();
 
@@ -25,7 +27,6 @@ function sendScheduledEmails() {
         eventStorageValues[i][2] = eventConfig[i].url;
         eventStorageValues[i][3] = eventConfig[i].blockAddresses;
         eventStorageValues[i][4] = eventConfig[i].flexAddresses;
-        //Logger.log(eventConfig[i])
     }
     eventStorageRange.setValues(eventStorageValues);
 
@@ -48,7 +49,6 @@ function sendScheduledEmails() {
         }
     }
     stackRange.setValues(stackValues);
-    
 }
 
 /**
